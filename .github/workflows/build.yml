@@ -10,6 +10,11 @@ on:
         required: true
         default: false
         type: boolean
+      branch:
+        description: 'Branch to checkout'
+        required: true
+        default: 'main'
+        type: string
   
 jobs:
   build:
@@ -26,6 +31,7 @@ jobs:
         with:
           repository: bugparty/cs251_kernel
           token: ${{ secrets.REPO_PAT }}
+          ref: ${{ github.event.client_payload.branch || github.event.inputs.branch }}
           fetch-depth: 1
       - name: Print runner machine size
         run: |
@@ -35,8 +41,7 @@ jobs:
           echo "Runner Temp Directory: ${{ runner.temp }}"
           echo "Runner Workspace Directory: ${{ runner.workspace }}"
           echo "Runner CPU Cores: `nproc`"
-          lscpu
-          
+
       - name: ls Directory
         run: ls -l
       - name: Set up ARM64 GCC cross-compile toolchain
