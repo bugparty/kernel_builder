@@ -36,6 +36,9 @@ jobs:
           echo "Runner Workspace Directory: ${{ runner.workspace }}"
           echo "Runner CPU Cores: `nproc`"
           lscpu
+          
+      - name: ls Directory
+        run: ls -l
       - name: Set up ARM64 GCC cross-compile toolchain
         if: matrix.architecture == 'x64'
         run: |
