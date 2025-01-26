@@ -1,0 +1,63 @@
+name: External Dispatch Build Linux Kernel
+on:
+  repository_dispatch:
+    types: [external-check]
+
+  workflow_dispatch:
+    inputs:
+      build_clean_ccache:
+        description: 'Clean cache or not'
+        required: true
+        default: false
+        type: boolean
+  
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-24.04-arm]
+        architecture: [arm64]
+
+    steps:
+      - name: Checkout another repo
+        uses: actions/checkout@v2
+        with:
+          repository: bugparty/cs251_kernel
+          token: ${{ secrets.REPO_PAT }}
+          fetch-depth: 1
+      - name: Print runner machine size
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Runner Architecture: ${{ runner.arch }}"
+          echo "Runner Name: ${{ runner.name }}"
+          echo "Runner Temp Directory: ${{ runner.temp }}"
+          echo "Runner Workspace Directory: ${{ runner.workspace }}"
+          echo "Runner CPU Cores: ${{ runner.cpu.cores }}"
+      - name: Set up ARM64 GCC cross-compile toolchain
+        if: matrix.architecture == 'x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y exuberant-ctags crossbuild-essential-arm64 
+      - name: Set up native ARM64 toolchain
+        if: matrix.architecture == 'arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y exuberant-ctags build-essential
+      - name: Set build_clean_ccache for pull request
+        if: github.event_name == 'pull_request'
+        run: echo "build_clean_ccache=false" >> $GITHUB_ENV
+      - name: Print enable_feature value
+        run: "echo \"clean_ccache: ${{ github.event.inputs.build_clean_ccache || env.build_clean_ccache }}\""
+        
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          create-symlink: true
+          restore: ${{ github.event.inputs.build_clean_ccache || env.build_clean_ccache }}
+
+      - name: Run compile script
+        run: |
+          chmod +x compile_w_ccache.sh
+          ./compile_w_ccache.sh
