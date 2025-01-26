@@ -58,13 +58,13 @@ jobs:
         if: github.event_name == 'pull_request'
         run: echo "build_clean_ccache=false" >> $GITHUB_ENV
       - name: Print enable_feature value
-        run: "echo \"clean_ccache: ${{ github.event.inputs.build_clean_ccache || env.build_clean_ccache }}\""
+        run: "echo \"clean_ccache: ${{ github.event.inputs.build_clean_ccache || github.event.client_payload.build_clean_ccache }}\""
         
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
-          restore: ${{ github.event.inputs.build_clean_ccache || env.build_clean_ccache }}
+          restore: ${{ github.event.inputs.build_clean_ccache || github.event.client_payload.build_clean_ccache }}
 
       - name: Run compile script
         run: |
