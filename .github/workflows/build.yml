@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       build_clean_ccache:
-        description: 'Clean cache or not'
+        description: 'with ccache or not'
         required: true
-        default: false
+        default: true
         type: boolean
       branch:
         description: 'Branch to checkout'
@@ -59,14 +59,18 @@ jobs:
         run: echo "build_clean_ccache=true" >> $GITHUB_ENV
       - name: Print enable_feature value
         run: |
-          echo "build_cache_enabled=${{ github.event.inputs.build_clean_ccache || github.event.client_payload.build_clean_ccache }}"  >> $GITHUB_ENV
-          echo "build_cache_enabled: ${{ env.build_cache_enabled }}"
+          if [[ -z "${{ github.event.inputs.build_clean_ccache }}" && -z "${{ env.build_clean_ccache }}" ]]; then
+            echo "build_clean_ccache=true" >> $GITHUB_ENV
+          else
+            echo "build_clean_ccache=${{ github.event.inputs.build_clean_ccache || env.build_clean_ccache }}" >> $GITHUB_ENV
+          fi
+          echo "build_clean_ccache: ${{ env.build_clean_ccache }}"
         
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
-          restore: ${{ env.build_cache_enabled }}
+          restore: ${{ env.build_clean_ccache }}
 
       - name: Run compile script
         run: |
