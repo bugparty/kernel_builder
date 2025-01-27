@@ -56,15 +56,17 @@ jobs:
           sudo apt-get install -y exuberant-ctags build-essential
       - name: Set build_clean_ccache for pull request
         if: github.event_name == 'pull_request'
-        run: echo "build_clean_ccache=false" >> $GITHUB_ENV
+        run: echo "build_clean_ccache=true" >> $GITHUB_ENV
       - name: Print enable_feature value
-        run: "echo \"clean_ccache: ${{ github.event.inputs.build_clean_ccache || github.event.client_payload.build_clean_ccache }}\""
+        run: |
+          echo "build_cache_enabled=${{ github.event.inputs.build_clean_ccache || github.event.client_payload.build_clean_ccache }}"  >> $GITHUB_ENV
+          echo "build_cache_enabled: ${{ env.build_cache_enabled }}"
         
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
-          restore: ${{ github.event.inputs.build_clean_ccache || github.event.client_payload.build_clean_ccache }}
+          restore: ${{ env.build_cache_enabled }}
 
       - name: Run compile script
         run: |
