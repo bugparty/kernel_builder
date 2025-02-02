@@ -72,7 +72,21 @@ jobs:
           create-symlink: true
           restore: ${{ env.build_clean_ccache }}
 
-      - name: Run compile script
+      - name: compile kernel
         run: |
           chmod +x compile_w_ccache.sh
           ./compile_w_ccache.sh
+      - name: build project 1
+        run: |
+          cd proj1
+          chmod +x compile.sh
+          ./compile.sh
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: proj1-apps
+          path: |
+            proj1/apps/hello/usrhello
+            proj1/apps/test_count_tasks/test_count_tasks
+            proj1/modules/mod_count_tasks/mod_count_tasks.ko
