@@ -32,7 +32,7 @@ jobs:
           repository: bugparty/cs251_kernel
           token: ${{ secrets.REPO_PAT }}
           ref: ${{ github.event.client_payload.branch || github.event.inputs.branch }}
-          
+
       - name: Print runner machine size
         run: |
           echo "Runner OS: ${{ runner.os }}"
@@ -70,6 +70,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           create-symlink: true
+          max-size: "800M"
           restore: ${{ env.build_clean_ccache }}
 
       - name: compile kernel
