@@ -1,8 +1,5 @@
-name: External Dispatch Build Linux Kernel
+name: Build Linux Kernel and pack
 on:
-  repository_dispatch:
-    types: [external-check]
-
   workflow_dispatch:
     inputs:
       build_clean_ccache:
@@ -17,7 +14,7 @@ on:
         type: string
   
 jobs:
-  build:
+  buildNPack:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -82,12 +79,16 @@ jobs:
           cd proj1
           chmod +x compile.sh
           ./compile.sh
-      
+      - name: pack linux kernel
+        run: |
+          ./pack.sh
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: proj1-apps
+          name: kernel-and-projects
           path: |
             proj1/apps/hello/usrhello
             proj1/apps/test_count_tasks/test_count_tasks
             proj1/modules/mod_count_tasks/mod_count_tasks.ko
+            kernel.tgz
+
