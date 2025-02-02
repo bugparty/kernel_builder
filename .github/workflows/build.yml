@@ -27,12 +27,12 @@ jobs:
 
     steps:
       - name: Checkout another repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: bugparty/cs251_kernel
           token: ${{ secrets.REPO_PAT }}
           ref: ${{ github.event.client_payload.branch || github.event.inputs.branch }}
-          fetch-depth: 1
+          
       - name: Print runner machine size
         run: |
           echo "Runner OS: ${{ runner.os }}"
