@@ -76,9 +76,18 @@ jobs:
           ./compile_w_ccache.sh
       - name: build project 1
         run: |
-          cd proj1
+          pushd proj1
           chmod +x compile.sh
           ./compile.sh
+          popd
+          pushd proj2
+          chmod +x compile.sh
+          ./compile.sh
+          popd
+          pushd proj3
+          chmod +x compile.sh
+          ./compile.sh
+          popd
       - name: pack linux kernel
         run: |
           ./pack.sh

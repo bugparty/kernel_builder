@@ -79,20 +79,17 @@ jobs:
           ./compile_w_ccache.sh
       - name: build project 1
         run: |
-          cd proj1
+          pushd proj1
           chmod +x compile.sh
           ./compile.sh
-      - name: build project 2
-        run: |
-          cd proj2
-          pushd apps/periodic
-          make -j$(nproc)
           popd
-          pushd apps/rtmon
-          make -j$(nproc)
+          pushd proj2
+          chmod +x compile.sh
+          ./compile.sh
           popd
-          pushd modules/rtmon
-          make -j$(nproc)
+          pushd proj3
+          chmod +x compile.sh
+          ./compile.sh
           popd
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -104,3 +101,5 @@ jobs:
             proj1/modules/mod_count_tasks/mod_count_tasks.ko
             proj2/apps/periodic/periodic
             proj2/apps/rtmon/rtmon
+            proj2/modules/rtmon/rtmon.ko
+            kernel.tgz
